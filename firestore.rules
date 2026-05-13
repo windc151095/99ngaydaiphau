@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitive Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // Validation Blueprints
+    function isValidArticle(data) {
+      return data.keys().hasAll(['title', 'content', 'imageUrls', 'createdAt', 'authorId', 'adminToken', 'isDeleted']) &&
+             data.keys().size() == 7 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 20000 &&
+             data.imageUrls is list && data.imageUrls.size() <= 3 &&
+             (data.imageUrls.size() == 0 || (
+               data.imageUrls.size() == 1 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000
+             ) || (
+               data.imageUrls.size() == 2 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000 && data.imageUrls[1] is string && data.imageUrls[1].size() <= 10000000
+             ) || (
+               data.imageUrls.size() == 3 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000 && data.imageUrls[1] is string && data.imageUrls[1].size() <= 10000000 && data.imageUrls[2] is string && data.imageUrls[2].size() <= 10000000
+             )) &&
+             data.createdAt is timestamp &&
+             data.authorId is string &&
+             data.adminToken is string && data.adminToken == '12345' &&
+             data.isDeleted is bool;
+    }
+
+    function isValidReflection(data) {
+      return data.keys().hasAll(['content', 'authorName', 'authorId', 'category', 'imageUrls', 'createdAt']) &&
+             data.keys().size() == 6 &&
+             data.content is string && data.content.size() > 0 && data.content.size() <= 3000 &&
+             data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100 &&
+             data.category is string && data.category in ['Bản thân', 'Gia đình', 'Sự nghiệp', 'Chung'] &&
+             data.imageUrls is list && data.imageUrls.size() <= 3 &&
+             (data.imageUrls.size() == 0 || (
+               data.imageUrls.size() == 1 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000
+             ) || (
+               data.imageUrls.size() == 2 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000 && data.imageUrls[1] is string && data.imageUrls[1].size() <= 10000000
+             ) || (
+               data.imageUrls.size() == 3 && data.imageUrls[0] is string && data.imageUrls[0].size() <= 10000000 && data.imageUrls[1] is string && data.imageUrls[1].size() <= 10000000 && data.imageUrls[2] is string && data.imageUrls[2].size() <= 10000000
+             )) &&
+             data.createdAt is timestamp &&
+             data.authorId is string && data.authorId == request.auth.uid;
+    }
+
+    // Collections
+    
+    match /admins/{userId} {
+      // Admins are created from server/console, read-only
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    match /articles/{articleId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isValidId(articleId) && isValidArticle(incoming()) && incoming().createdAt == request.time;
+      allow update: if isValidId(articleId) && existing().adminToken == '12345' && isValidArticle(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['title', 'content', 'imageUrls', 'isDeleted']);
+      allow delete: if false; // Soft-delete only
+    }
+
+    match /reflections/{reflectionId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn() && isValidId(reflectionId) && isValidReflection(incoming()) && incoming().createdAt == request.time;
+      allow update: if isSignedIn() && isValidId(reflectionId) && existing().authorId == request.auth.uid && isValidReflection(incoming()) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['content', 'category', 'imageUrls']);
+      allow delete: if isSignedIn() && (existing().authorId == request.auth.uid || isAdmin()) && isValidId(reflectionId);
+    }
+  }
+}

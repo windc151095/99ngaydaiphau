@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Article": {
+      "title": "Article",
+      "description": "A practice article posted by an admin.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string", "description": "Base64 encoded image or URL" },
+        "createdAt": { "type": "number", "description": "Timestamp" },
+        "authorId": { "type": "string" },
+        "adminToken": { "type": "string" },
+        "isDeleted": { "type": "boolean" }
+      },
+      "required": ["title", "content", "imageUrl", "createdAt", "authorId", "adminToken", "isDeleted"]
+    },
+    "Reflection": {
+      "title": "Reflection",
+      "description": "Student emotion/reflection posted on the site.",
+      "type": "object",
+      "properties": {
+        "content": { "type": "string", "maxLength": 3000 },
+        "authorName": { "type": "string" },
+        "authorId": { "type": "string" },
+        "category": { "type": "string", "enum": ["Bản thân", "Gia đình", "Sự nghiệp", "Chung"] },
+        "imageUrls": {
+          "type": "array",
+          "items": { "type": "string", "description": "Base64 encoded image or URL" },
+          "maxItems": 3
+        },
+        "createdAt": { "type": "number", "description": "Timestamp" }
+      },
+      "required": ["content", "authorName", "authorId", "category", "imageUrls", "createdAt"]
+    },
+    "AdminConfig": {
+      "title": "Admin Config",
+      "description": "List of admin uids.",
+      "type": "object",
+      "properties": {
+        "isAdmin": { "type": "boolean" }
+      },
+      "required": ["isAdmin"]
+    }
+  },
+  "firestore": {
+    "/articles/{articleId}": {
+      "schema": { "$ref": "#/entities/Article" },
+      "description": "Collection of practice articles."
+    },
+    "/reflections/{reflectionId}": {
+      "schema": { "$ref": "#/entities/Reflection" },
+      "description": "Collection of student reflections."
+    },
+    "/admins/{userId}": {
+      "schema": { "$ref": "#/entities/AdminConfig" },
+      "description": "Admin users store."
+    }
+  }
+}
