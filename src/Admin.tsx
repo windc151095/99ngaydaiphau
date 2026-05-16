@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, setDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, setDoc, where, deleteDoc } from 'firebase/firestore';
 import { compressImage, getDriveDirectUrl } from './lib/imageUtils';
 import { Link } from 'react-router-dom';
 
@@ -18,6 +18,41 @@ export default function Admin() {
   const [registrations, setRegistrations] = useState<any[]>([]);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isSavingZalo, setIsSavingZalo] = useState(false);
+  const [editingReg, setEditingReg] = useState<any>(null);
+  const [isDeletingReg, setIsDeletingReg] = useState<string | null>(null);
+
+  const handleDeleteReg = async (id: string) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa đăng ký này?')) {
+      setIsDeletingReg(id);
+      try {
+        setRegistrations(prev => prev.filter(reg => reg.id !== id));
+        await deleteDoc(doc(db, 'registrations', id));
+      } catch (error) {
+        console.error('Lỗi khi xóa:', error);
+        alert('Lỗi xóa đăng ký');
+      } finally {
+        setIsDeletingReg(null);
+      }
+    }
+  };
+
+  const handleUpdateReg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingReg) return;
+    try {
+      await updateDoc(doc(db, 'registrations', editingReg.id), {
+        name: editingReg.name,
+        phone: editingReg.phone,
+        age: Number(editingReg.age),
+        referrer: editingReg.referrer,
+        desire: editingReg.desire
+      });
+      setEditingReg(null);
+    } catch (error) {
+      console.error('Lỗi khi cập nhật:', error);
+      alert('Lỗi cập nhật đăng ký');
+    }
+  };
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('localAdminToken');
@@ -263,12 +298,13 @@ export default function Admin() {
                   <th className="px-4 py-3 font-bold text-gray-700">Tuổi</th>
                   <th className="px-4 py-3 font-bold text-gray-700">Giới thiệu</th>
                   <th className="px-4 py-3 font-bold text-gray-700">Mong muốn</th>
+                  <th className="px-4 py-3 font-bold text-gray-700 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {registrations.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                       Chưa có dữ liệu đăng ký
                     </td>
                   </tr>
@@ -283,12 +319,52 @@ export default function Admin() {
                       <td className="px-4 py-3">{reg.age}</td>
                       <td className="px-4 py-3 text-gray-600">{reg.referrer}</td>
                       <td className="px-4 py-3 max-w-xs truncate" title={reg.desire}>{reg.desire}</td>
+                      <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <button onClick={() => setEditingReg(reg)} className="text-blue-600 hover:text-blue-800 font-medium mr-3">Sửa</button>
+                        <button onClick={() => handleDeleteReg(reg.id)} disabled={isDeletingReg === reg.id} className="text-red-600 hover:text-red-800 font-medium disabled:opacity-50">
+                          {isDeletingReg === reg.id ? 'Đang xóa...' : 'Xóa'}
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
               </tbody>
             </table>
           </div>
+          
+          {editingReg && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+              <div className="bg-white rounded-sm shadow-xl max-w-md w-full p-6">
+                <h3 className="text-xl font-bold mb-4">Chỉnh sửa đăng ký</h3>
+                <form onSubmit={handleUpdateReg} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Họ tên</label>
+                    <input type="text" value={editingReg.name} onChange={e => setEditingReg({...editingReg, name: e.target.value})} className="w-full border p-2 rounded outline-none focus:border-[#6E2D2A]" required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+                    <input type="text" value={editingReg.phone} onChange={e => setEditingReg({...editingReg, phone: e.target.value})} className="w-full border p-2 rounded outline-none focus:border-[#6E2D2A]" required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tuổi</label>
+                    <input type="number" value={editingReg.age} onChange={e => setEditingReg({...editingReg, age: e.target.value})} className="w-full border p-2 rounded outline-none focus:border-[#6E2D2A]" required />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Người giới thiệu (nếu có)</label>
+                    <input type="text" value={editingReg.referrer || ''} onChange={e => setEditingReg({...editingReg, referrer: e.target.value})} className="w-full border p-2 rounded outline-none focus:border-[#6E2D2A]" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Mong muốn</label>
+                    <textarea value={editingReg.desire} onChange={e => setEditingReg({...editingReg, desire: e.target.value})} className="w-full border p-2 rounded outline-none focus:border-[#6E2D2A] min-h-[100px]" required />
+                  </div>
+                  <div className="flex justify-end gap-3 mt-6">
+                    <button type="button" onClick={() => setEditingReg(null)} className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50 font-medium">Hủy</button>
+                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium">Lưu thay đổi</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="mb-12 border-b pb-12">

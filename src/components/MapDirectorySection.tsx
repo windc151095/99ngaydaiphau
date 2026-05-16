@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Map, Layers, Grid, Compass, Circle, Pyramid, Droplet, ChevronUp, ChevronDown, Zap, BookOpen, TreePine } from "lucide-react";
 
 export default function MapDirectorySection() {
-  const [isMapExpanded, setIsMapExpanded] = useState(true);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
   const [isLifeExpanded, setIsLifeExpanded] = useState(false);
   const [activeItem, setActiveItem] = useState<string | null>("thap-anh-sang");
 
@@ -64,8 +64,10 @@ export default function MapDirectorySection() {
                         <Layers className={`w-5 h-5 shrink-0 ${activeItem === 'thap-anh-sang' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-lg uppercase ${activeItem === 'thap-anh-sang' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>1. THÁP ÁNH SÁNG</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'thap-anh-sang' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'thap-anh-sang' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'thap-anh-sang' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     
@@ -132,8 +134,10 @@ export default function MapDirectorySection() {
                         <Grid className={`w-5 h-5 shrink-0 ${activeItem === 'thap-gia-tri' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-lg uppercase ${activeItem === 'thap-gia-tri' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>2. THÁP GIÁ TRỊ SỐNG</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'thap-gia-tri' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'thap-gia-tri' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'thap-gia-tri' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -164,8 +168,10 @@ export default function MapDirectorySection() {
                         <Compass className={`w-5 h-5 shrink-0 ${activeItem === 'canh-gioi' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-lg uppercase ${activeItem === 'canh-gioi' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>3. 9 CẢNH GIỚI CỦA TÂM...</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'canh-gioi' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'canh-gioi' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'canh-gioi' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -196,8 +202,10 @@ export default function MapDirectorySection() {
                         <Circle className={`w-5 h-5 shrink-0 ${activeItem === 'vong-tron' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-lg uppercase ${activeItem === 'vong-tron' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>4. VÒNG TRÒN HẠNH PHÚC</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'vong-tron' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'vong-tron' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'vong-tron' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -228,8 +236,10 @@ export default function MapDirectorySection() {
                         <Pyramid className={`w-5 h-5 shrink-0 ${activeItem === 'thap-tam-thuc' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-lg uppercase ${activeItem === 'thap-tam-thuc' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>5. THÁP TÂM THỨC</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'thap-tam-thuc' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'thap-tam-thuc' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'thap-tam-thuc' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -296,8 +306,10 @@ export default function MapDirectorySection() {
                         <Zap className={`w-5 h-5 shrink-0 ${activeItem === 'lien-lac' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-base uppercase ${activeItem === 'lien-lac' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>1. LIÊN LẠC TÂM THỨC</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'lien-lac' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'lien-lac' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'lien-lac' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -328,8 +340,10 @@ export default function MapDirectorySection() {
                         <BookOpen className={`w-5 h-5 shrink-0 ${activeItem === 'cot-nang-luong' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-base uppercase ${activeItem === 'cot-nang-luong' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>2. CỘT NĂNG LƯỢNG SỐNG</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'cot-nang-luong' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'cot-nang-luong' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'cot-nang-luong' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
@@ -360,8 +374,10 @@ export default function MapDirectorySection() {
                         <TreePine className={`w-5 h-5 shrink-0 ${activeItem === 'tu-hoc' ? 'text-[#8B2C24]' : 'text-[#8B2C24]'}`} />
                         <span className={`font-bold text-left text-sm md:text-base uppercase ${activeItem === 'tu-hoc' ? 'text-[#8B2C24]' : 'text-[var(--color-ink-dark)]'}`}>3. TU, HỌC, LÀM ĐÚNG</span>
                       </div>
-                      <div className="shrink-0 ml-2">
-                        {activeItem === 'tu-hoc' ? <ChevronUp className="w-5 h-5 text-[#8B2C24]" /> : <ChevronDown className="w-5 h-5 text-[#b09e86]" />}
+                      <div className="shrink-0 ml-2 flex items-center">
+                        <span className={`text-[10px] md:text-xs font-bold uppercase tracking-wider ${activeItem === 'tu-hoc' ? 'text-[#8B2C24]' : 'text-[var(--color-muted-dark)]'}`}>
+                          {activeItem === 'tu-hoc' ? 'Thu gọn' : 'Xem thêm'}
+                        </span>
                       </div>
                     </button>
                     <AnimatePresence>
