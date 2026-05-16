@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, setDoc, where } from 'firebase/firestore';
 import { compressImage, getDriveDirectUrl } from './lib/imageUtils';
+import { Link } from 'react-router-dom';
 
 export default function Admin() {
   const [articles, setArticles] = useState<any[]>([]);
@@ -189,10 +190,10 @@ export default function Admin() {
       <div className="max-w-4xl mx-auto bg-white p-8 rounded shadow">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div className="flex items-center gap-4">
-            <a href="/" className="text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1">
+            <Link to="/" className="text-gray-500 hover:text-gray-800 transition-colors flex items-center gap-1">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
               Về trang chủ
-            </a>
+            </Link>
             <h1 className="text-2xl font-bold hidden sm:block">| Admin Dashboard</h1>
           </div>
           <div className="flex items-center gap-4">

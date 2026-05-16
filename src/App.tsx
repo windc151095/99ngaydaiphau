@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
-import { ArrowRight, BatteryWarning, HeartCrack, PenTool, UserX, Ghost, ChevronRight, ChevronLeft, Scale, VenetianMask, Brain, Link, Repeat, UserMinus, Ear, ShoppingBag, Zap, TrendingDown, MessageSquareX, CloudLightning, Flag, PauseCircle, Target, Footprints, Flower2, Sunrise, HeartHandshake, BatteryCharging, Trophy, Sun, Moon, AlertCircle, Eye, Flame, ShieldAlert, Compass, Sprout, Sparkles } from "lucide-react";
+import { ArrowRight, BatteryWarning, HeartCrack, PenTool, UserX, Ghost, ChevronRight, ChevronLeft, Scale, VenetianMask, Brain, Link as LinkIcon, Repeat, UserMinus, Ear, ShoppingBag, Zap, TrendingDown, MessageSquareX, CloudLightning, Flag, PauseCircle, Target, Footprints, Flower2, Sunrise, HeartHandshake, BatteryCharging, Trophy, Sun, Moon, AlertCircle, Eye, Flame, ShieldAlert, Compass, Sprout, Sparkles } from "lucide-react";
 import React, { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import UnconsciousLevelsSection from "./components/UnconsciousLevelsSection";
 import WaterFlushStorySection from "./components/WaterFlushStorySection";
@@ -409,9 +410,9 @@ export default function App() {
       <footer className="py-12 border-t border-[var(--color-border)] bg-[var(--color-ink-dark)] text-center text-white/50">
         <p>© 2024 Sống Sáng Suốt. All rights reserved.</p>
         <p className="mt-4">
-          <a href="/admin" className="hover:text-white transition-colors underline decoration-white/20 underline-offset-4">
+          <Link to="/admin" className="hover:text-white transition-colors underline decoration-white/20 underline-offset-4">
             Trang Quản Trị Hệ Thống (Admin)
-          </a>
+          </Link>
         </p>
       </footer>
     </div>
