@@ -12,7 +12,11 @@ export default function ArticlesSection() {
       const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setArticles(posts);
     }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'articles');
+      try {
+        handleFirestoreError(error, OperationType.LIST, 'articles');
+      } catch (err) {
+        console.error("Caught firestore error silently:", err);
+      }
     });
     return unsubscribe;
   }, []);

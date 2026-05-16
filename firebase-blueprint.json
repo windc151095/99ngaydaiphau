@@ -33,6 +33,29 @@
       },
       "required": ["content", "authorName", "authorId", "category", "imageUrls", "createdAt"]
     },
+    "Registration": {
+      "title": "Registration",
+      "description": "User registration for the 99-day challenge.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "age": { "type": "number" },
+        "referrer": { "type": "string" },
+        "desire": { "type": "string", "maxLength": 2000 },
+        "createdAt": { "type": "number", "description": "Timestamp" }
+      },
+      "required": ["name", "phone", "age", "desire", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global settings for the application.",
+      "type": "object",
+      "properties": {
+        "zaloLink": { "type": "string" }
+      },
+      "required": ["zaloLink"]
+    },
     "AdminConfig": {
       "title": "Admin Config",
       "description": "List of admin uids.",
@@ -51,6 +74,14 @@
     "/reflections/{reflectionId}": {
       "schema": { "$ref": "#/entities/Reflection" },
       "description": "Collection of student reflections."
+    },
+    "/registrations/{registrationId}": {
+      "schema": { "$ref": "#/entities/Registration" },
+      "description": "Collection of user registrations."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/Settings" },
+      "description": "Global settings like Zalo link."
     },
     "/admins/{userId}": {
       "schema": { "$ref": "#/entities/AdminConfig" },

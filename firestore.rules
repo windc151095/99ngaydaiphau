@@ -3,7 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // 0. Global Safety Net
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
 
     // Primitive Helpers
@@ -51,6 +51,23 @@ service cloud.firestore {
              data.authorId is string && data.authorId == request.auth.uid;
     }
 
+    function isValidRegistration(data) {
+      return data.keys().hasAll(['name', 'phone', 'age', 'desire', 'createdAt']) &&
+             (data.keys().size() == 5 || (data.keys().size() == 6 && data.keys().hasAll(['referrer']))) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.phone is string && data.phone.size() > 0 && data.phone.size() <= 20 &&
+             data.age is number &&
+             data.desire is string && data.desire.size() > 0 && data.desire.size() <= 2000 &&
+             data.createdAt is timestamp &&
+             (!data.keys().hasAll(['referrer']) || (data.referrer is string && data.referrer.size() <= 100));
+    }
+
+    function isValidSettings(data) {
+      return data.keys().hasAll(['zaloLink']) &&
+             data.keys().size() == 1 &&
+             data.zaloLink is string && data.zaloLink.size() <= 500;
+    }
+
     // Collections
     
     match /admins/{userId} {
@@ -76,6 +93,24 @@ service cloud.firestore {
       allow update: if isSignedIn() && isValidId(reflectionId) && existing().authorId == request.auth.uid && isValidReflection(incoming()) &&
                     incoming().diff(existing()).affectedKeys().hasOnly(['content', 'category', 'imageUrls']);
       allow delete: if isSignedIn() && (existing().authorId == request.auth.uid || isAdmin()) && isValidId(reflectionId);
+    }
+
+    match /registrations/{registrationId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isValidId(registrationId) && isValidRegistration(incoming()) && incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    match /settings/{settingId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isValidId(settingId) && isValidSettings(incoming());
+      allow update: if isValidId(settingId) &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['zaloLink']) &&
+                    incoming().zaloLink is string && incoming().zaloLink.size() <= 500;
+      allow delete: if false;
     }
   }
 }

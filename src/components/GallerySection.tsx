@@ -24,7 +24,11 @@ export default function GallerySection() {
       });
       setImages(allImages);
     }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'articles for gallery');
+      try {
+        handleFirestoreError(error, OperationType.LIST, 'articles for gallery');
+      } catch (err) {
+        console.error("Caught firestore error silently:", err);
+      }
     });
     return unsubscribe;
   }, []);

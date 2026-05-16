@@ -77,8 +77,7 @@ const data = [
   }
 ];
 
-export default function UnconsciousLevelsSection() {
-  const [isMainExpanded, setIsMainExpanded] = useState(false);
+export function UnconsciousLevelsContent() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const toggleExpand = (id: number) => {
@@ -87,45 +86,20 @@ export default function UnconsciousLevelsSection() {
 
   return (
     <div className="w-full max-w-4xl mx-auto mb-16 font-serif px-4">
-      <button 
-        onClick={() => setIsMainExpanded(!isMainExpanded)}
-        className="w-full flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 bg-white/80 backdrop-blur border-2 border-[#DBCDB3] shadow-sm rounded-md md:rounded-md hover:bg-white transition-all focus:outline-none group gap-4"
-      >
-        <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 md:gap-6">
-          <div className="shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#FCFBF8] border border-[#DBCDB3] rounded-md shadow-inner">
-            <EyeOff className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--color-ink-dark)]" />
-          </div>
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-widest text-[var(--color-ink-dark)] m-0 leading-tight mt-2 md:mt-2.5">
-            9 TẦNG VÔ THỨC
-          </h2>
-        </div>
-        <div className={`w-12 h-12 md:w-16 md:h-16 rounded-md bg-[#F6F3E9] border border-[#DBCDB3] flex items-center justify-center shrink-0 transition-transform duration-700 ease-in-out group-hover:shadow-sm mt-2 md:mt-0 ${isMainExpanded ? 'rotate-180 bg-[#FCFBF8]' : ''}`}>
-          <ChevronDown className="w-6 h-6 md:w-8 md:h-8 text-[var(--color-ink-dark)]" />
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {isMainExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="flex flex-col gap-4 mt-6 pt-2">
-              {data.map((item, index) => {
-                const isExpanded = expandedId === item.id;
-                return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                    className={`border transition-all duration-700 ease-in-out rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-md ${
-                      isExpanded ? 'border-[#988673] bg-[#FFFdf8]' : 'border-[#DBCDB3] bg-[#F6F3E9]'
-                    }`}
-                  >
+      <div className="flex flex-col gap-4 mt-6 pt-2">
+        {data.map((item, index) => {
+          const isExpanded = expandedId === item.id;
+          return (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              className={`border transition-all duration-700 ease-in-out rounded-[1.5rem] overflow-hidden shadow-sm hover:shadow-md ${
+                isExpanded ? 'border-[#988673] bg-[#FFFdf8]' : 'border-[#DBCDB3] bg-[#F6F3E9]'
+              }`}
+            >
               <button
                 onClick={() => toggleExpand(item.id)}
                 className="w-full text-left p-4 md:p-6 flex justify-between items-start md:items-center gap-4 focus:outline-none"
@@ -198,7 +172,42 @@ export default function UnconsciousLevelsSection() {
             </motion.div>
           );
         })}
-            </div>
+      </div>
+    </div>
+  );
+}
+
+export default function UnconsciousLevelsSection() {
+  const [isMainExpanded, setIsMainExpanded] = useState(false);
+
+  return (
+    <div className="w-full max-w-4xl mx-auto mb-16 font-serif px-4">
+      <button 
+        onClick={() => setIsMainExpanded(!isMainExpanded)}
+        className="w-full flex flex-col md:flex-row items-center justify-between p-6 sm:p-8 bg-white/80 backdrop-blur border-2 border-[#DBCDB3] shadow-sm rounded-md md:rounded-md hover:bg-white transition-all focus:outline-none group gap-4"
+      >
+        <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4 md:gap-6">
+          <div className="shrink-0 flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#FCFBF8] border border-[#DBCDB3] rounded-md shadow-inner">
+            <EyeOff className="w-6 h-6 sm:w-8 sm:h-8 text-[var(--color-ink-dark)]" />
+          </div>
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-widest text-[var(--color-ink-dark)] m-0 leading-tight mt-2 md:mt-2.5">
+            9 TẦNG VÔ THỨC
+          </h2>
+        </div>
+        <div className={`w-12 h-12 md:w-16 md:h-16 rounded-md bg-[#F6F3E9] border border-[#DBCDB3] flex items-center justify-center shrink-0 transition-transform duration-700 ease-in-out group-hover:shadow-sm mt-2 md:mt-0 ${isMainExpanded ? 'rotate-180 bg-[#FCFBF8]' : ''}`}>
+          <ChevronDown className="w-6 h-6 md:w-8 md:h-8 text-[var(--color-ink-dark)]" />
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {isMainExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <UnconsciousLevelsContent />
           </motion.div>
         )}
       </AnimatePresence>

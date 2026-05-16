@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, setDoc, where } from 'firebase/firestore';
 import { compressImage, getDriveDirectUrl } from './lib/imageUtils';
 
 export default function Admin() {
@@ -9,10 +9,14 @@ export default function Admin() {
   const [content, setContent] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [zaloLink, setZaloLink] = useState('');
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLocalAdmin, setIsLocalAdmin] = useState(false);
+  const [registrations, setRegistrations] = useState<any[]>([]);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isSavingZalo, setIsSavingZalo] = useState(false);
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('localAdminToken');
@@ -30,7 +34,26 @@ export default function Admin() {
       }, (error) => {
         handleFirestoreError(error, OperationType.LIST, 'articles');
       });
-      return unsubscribe;
+
+      const unsubscribeSettings = onSnapshot(doc(db, 'settings', 'general'), (docSnap) => {
+        if (docSnap.exists()) {
+          setZaloLink(docSnap.data().zaloLink || '');
+        }
+      });
+
+      const qReg = query(collection(db, 'registrations'), orderBy('createdAt', 'desc'));
+      const unsubscribeReg = onSnapshot(qReg, (snapshot) => {
+        const regs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setRegistrations(regs);
+      }, (error) => {
+        handleFirestoreError(error, OperationType.LIST, 'registrations');
+      });
+
+      return () => {
+        unsubscribe();
+        unsubscribeSettings();
+        unsubscribeReg();
+      };
     }
   }, [isLocalAdmin]);
 
@@ -177,6 +200,95 @@ export default function Admin() {
             <button onClick={handleLogout} className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded transition-colors font-medium">Đăng xuất</button>
           </div>
         </div>
+
+        <section className="mb-12 border-b pb-12">
+          <h2 className="text-xl font-bold mb-6">Cấu Hình Chung</h2>
+          <div className="bg-slate-50 border p-5 rounded-sm">
+            <h3 className="font-bold mb-3 text-[#24201C] flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M2.999 12c0 5.4 4.5 9.771 10.088 10L13.1 24l2.133-3.213c4.276-.713 7.767-4.225 7.767-8.787 0-5.523-4.925-10-11-10s-11 4.477-11 10zm11.396 2.378h-2.186l2.373-3.2c.115-.152.193-.321.233-.502.04-.182.042-.37-.004-.552-.047-.183-.135-.35-.258-.493L13.1 8 8 11.536h2.185L7.81 14.736c-.114.152-.191.321-.231.503-.04.181-.042.368.005.55.047.183.136.35.259.493L9.297 18 14.395 14.378z"/></svg>
+              Link Nhóm Zalo
+            </h3>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={zaloLink}
+                onChange={(e) => setZaloLink(e.target.value)}
+                placeholder="https://zalo.me/g/..."
+                className="flex-1 border p-3 rounded-sm outline-none focus:border-[#6E2D2A] transition-colors"
+                disabled={isSavingZalo}
+              />
+              <button
+                onClick={async () => {
+                  setIsSavingZalo(true);
+                  setSaveSuccess(false);
+                  try {
+                    await setDoc(doc(db, 'settings', 'general'), { zaloLink }, { merge: true });
+                    setSaveSuccess(true);
+                    setTimeout(() => setSaveSuccess(false), 3000);
+                  } catch (e) {
+                    alert('Lỗi cập nhật. Vui lòng thử lại.');
+                    console.error(e);
+                  } finally {
+                    setIsSavingZalo(false);
+                  }
+                }}
+                disabled={isSavingZalo}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 rounded-sm transition-colors flex items-center justify-center min-w-[100px]"
+                id="zalo-save-btn"
+              >
+                {isSavingZalo ? 'Đang lưu...' : 'Lưu'}
+              </button>
+            </div>
+            {saveSuccess ? (
+              <p className="text-green-600 text-sm mt-2 font-medium flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                Lưu cấu hình thành công!
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500 mt-2">Đường link này sẽ hiển thị ở "Góc Chuyển Hóa", kèm nút bấm tham gia sau khi đăng ký/đăng nhập.</p>
+            )}
+          </div>
+        </section>
+
+        <section className="mb-12 border-b pb-12">
+          <h2 className="text-xl font-bold mb-6">Danh Sách Đăng Ký</h2>
+          <div className="overflow-x-auto bg-white border rounded-sm">
+            <table className="min-w-full text-sm text-left">
+              <thead className="bg-slate-50 border-b">
+                <tr>
+                  <th className="px-4 py-3 font-bold text-gray-700">Thời gian</th>
+                  <th className="px-4 py-3 font-bold text-gray-700">Họ tên</th>
+                  <th className="px-4 py-3 font-bold text-gray-700">SĐT</th>
+                  <th className="px-4 py-3 font-bold text-gray-700">Tuổi</th>
+                  <th className="px-4 py-3 font-bold text-gray-700">Giới thiệu</th>
+                  <th className="px-4 py-3 font-bold text-gray-700">Mong muốn</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {registrations.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                      Chưa có dữ liệu đăng ký
+                    </td>
+                  </tr>
+                ) : (
+                  registrations.map(reg => (
+                    <tr key={reg.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                        {reg.createdAt?.toDate ? new Date(reg.createdAt.toDate()).toLocaleString('vi-VN') : 'Mới đây'}
+                      </td>
+                      <td className="px-4 py-3 font-medium">{reg.name}</td>
+                      <td className="px-4 py-3">{reg.phone}</td>
+                      <td className="px-4 py-3">{reg.age}</td>
+                      <td className="px-4 py-3 text-gray-600">{reg.referrer}</td>
+                      <td className="px-4 py-3 max-w-xs truncate" title={reg.desire}>{reg.desire}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         <section className="mb-12 border-b pb-12">
           <h2 className="text-xl font-bold mb-6">Đăng Bài Viết Thực Hành Mới</h2>

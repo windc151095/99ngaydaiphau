@@ -13,8 +13,9 @@ export const loginWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login failed:", error);
+    alert("Đăng nhập thất bại. Nếu bạn đang xem ứng dụng trong cửa sổ thu nhỏ, vui lòng mở ứng dụng ở thẻ mới (Open in new tab) rồi thử lại. Lỗi: " + (error.message || error));
     throw error;
   }
 };

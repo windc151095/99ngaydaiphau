@@ -1,13 +1,14 @@
 import { motion } from "motion/react";
-import { ArrowRight, BatteryWarning, HeartCrack, PenTool, UserX, Ghost, ChevronRight, Scale, VenetianMask, Brain, Link, Repeat, UserMinus, Ear, ShoppingBag, Zap, TrendingDown, MessageSquareX, CloudLightning, Flag, PauseCircle, Target, Footprints, Flower2, Sunrise, HeartHandshake, BatteryCharging, Trophy, Sun, Moon, AlertCircle, Eye, Flame, ShieldAlert, Compass, Sprout, Sparkles } from "lucide-react";
-import React from "react";
+import { ArrowRight, BatteryWarning, HeartCrack, PenTool, UserX, Ghost, ChevronRight, ChevronLeft, Scale, VenetianMask, Brain, Link, Repeat, UserMinus, Ear, ShoppingBag, Zap, TrendingDown, MessageSquareX, CloudLightning, Flag, PauseCircle, Target, Footprints, Flower2, Sunrise, HeartHandshake, BatteryCharging, Trophy, Sun, Moon, AlertCircle, Eye, Flame, ShieldAlert, Compass, Sprout, Sparkles } from "lucide-react";
+import React, { useRef, useState, useEffect } from "react";
 
 import UnconsciousLevelsSection from "./components/UnconsciousLevelsSection";
 import WaterFlushStorySection from "./components/WaterFlushStorySection";
 import FrameworksGroupSection from "./components/FrameworksGroupSection";
-import MantrasSection from "./components/MantrasSection";
 import ResultsSection from "./components/ResultsSection";
 import BonusSection from "./components/BonusSection";
+import MapDirectorySection from "./components/MapDirectorySection";
+import MantrasSection from "./components/MantrasSection";
 import ReflectionsSection from "./components/ReflectionsSection";
 
 const FadeIn = ({ children, delay = 0, className = "" }: { children: React.ReactNode, delay?: number, className?: string }) => (
@@ -22,7 +23,38 @@ const FadeIn = ({ children, delay = 0, className = "" }: { children: React.React
   </motion.div>
 );
 
+import RegistrationFormSection from './components/sections/RegistrationFormSection';
 export default function App() {
+  const painScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollPainLeft, setCanScrollPainLeft] = useState(false);
+  const [canScrollPainRight, setCanScrollPainRight] = useState(true);
+
+  const checkPainScroll = () => {
+    if (painScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = painScrollRef.current;
+      setCanScrollPainLeft(scrollLeft > 0);
+      setCanScrollPainRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  useEffect(() => {
+    checkPainScroll();
+    window.addEventListener("resize", checkPainScroll);
+    return () => window.removeEventListener("resize", checkPainScroll);
+  }, []);
+
+  const scrollPainLeft = () => {
+    if (painScrollRef.current) {
+      painScrollRef.current.scrollBy({ left: -340, behavior: 'smooth' });
+    }
+  };
+
+  const scrollPainRight = () => {
+    if (painScrollRef.current) {
+      painScrollRef.current.scrollBy({ left: 340, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen selection:bg-[var(--color-accent)] selection:text-white">
       {/* SECTION 1: HERO */}
@@ -58,7 +90,7 @@ export default function App() {
           </FadeIn>
 
           <FadeIn delay={0.4}>
-            <button className="group relative w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 sm:px-10 font-serif font-bold tracking-widest uppercase text-white bg-[#8B2C24] hover:bg-[#6E2D2A] transition-all duration-700 ease-in-out rounded-md text-sm sm:text-base overflow-hidden">
+            <button onClick={() => { document.getElementById("registration-form")?.scrollIntoView({ behavior: "smooth" }); }} className="group relative w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 sm:px-10 font-serif font-bold tracking-widest uppercase text-white bg-[#8B2C24] hover:bg-[#6E2D2A] transition-all duration-700 ease-in-out rounded-md text-sm sm:text-base overflow-hidden">
               <span className="relative z-10 flex items-center gap-2">
                 TÔI MUỐN TỈNH GIẤC NGAY HÔM NAY <span className="text-lg group-hover:translate-x-1 transition-transform ml-1">&rarr;</span>
               </span>
@@ -77,7 +109,22 @@ export default function App() {
             </h2>
           </FadeIn>
 
-          <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-8 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="relative group/pain">
+            {canScrollPainLeft && (
+              <button 
+                onClick={scrollPainLeft}
+                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg items-center justify-center text-[var(--color-ink-dark)] hover:bg-[var(--color-surface)] hover:scale-110 transition-all border border-[var(--color-border)] opacity-0 group-hover/pain:opacity-100"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            <div 
+              ref={painScrollRef} 
+              onScroll={checkPainScroll}
+              className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-8 -mx-4 px-4 sm:-mx-6 sm:px-6 md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
             {[
               { icon: HeartCrack, title: "1. Mất kiểm soát cảm xúc", desc: "Vừa hứa sẽ kiên nhẫn, nhỏ nhẹ với con, nhưng chỉ 5 phút sau lại gầm lên tức giận như một kẻ xa lạ. Để rồi đêm về nhìn con ngủ lại trào nước mắt dằn vặt bản thân?" },
               { icon: BatteryWarning, title: "2. Bận rộn ảo", desc: "Cày cuốc 12-14 tiếng/ngày, lướt điện thoại vô thức đến khuya. Nhìn bề ngoài rất bận rộn, nhưng cuối ngày thấy lòng trống rỗng, không tạo ra giá trị gì ngoài sự rã rời của thể xác?" },
@@ -98,6 +145,17 @@ export default function App() {
                 <p className="text-[var(--color-muted-dark)] text-sm leading-relaxed">{item.desc}</p>
               </FadeIn>
             ))}
+            </div>
+
+            {canScrollPainRight && (
+              <button 
+                onClick={scrollPainRight}
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-12 h-12 bg-white rounded-full shadow-lg items-center justify-center text-[var(--color-ink-dark)] hover:bg-[var(--color-surface)] hover:scale-110 transition-all border border-[var(--color-border)] opacity-0 group-hover/pain:opacity-100"
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
           </div>
 
           <FadeIn delay={1.1} className="mt-12 md:mt-20 text-center text-[var(--color-ink)] max-w-3xl mx-auto px-4">
@@ -106,25 +164,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* CÂU CHUYỆN: DỘI NƯỚC */}
-      <WaterFlushStorySection />
 
-      {/* TỔ HỢP TƯƠNG TÁC: BẢN ĐỒ & BẬC THANG */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-[var(--color-border)] bg-[var(--color-paper)]">
-        <div className="text-center max-w-4xl mx-auto mb-8 md:mb-12">
-          <FadeIn>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[var(--color-ink-dark)] font-bold uppercase tracking-widest leading-tight mb-4">
-              NHẬN DIỆN RÕ NGUYÊN NHÂN VÀ CÁC ĐIỂM MẮC KẸT TRONG TÂM HỒN
-            </h2>
-            <p className="font-serif italic text-base sm:text-lg text-[var(--color-muted-dark)]">(bắt lươn, trói chó, buộc khỉ...)</p>
-          </FadeIn>
-        </div>
-        <FadeIn delay={0.2}>
-          <UnconsciousLevelsSection />
-        </FadeIn>
-      </section>
-
-      <FrameworksGroupSection />
 
       {/* SECTION 4: THỬ THÁCH 99 NGÀY */}
       <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
@@ -350,77 +390,21 @@ export default function App() {
         </div>
       </section>
 
-      <MantrasSection />
-
       <ResultsSection />
+
+      {/* CÂU CHUYỆN: DỘI NƯỚC */}
+      <WaterFlushStorySection />
+
       
-      <BonusSection />
+      
+      <FrameworksGroupSection />
+<BonusSection />
+<MapDirectorySection />
+<MantrasSection />
 
-      {/* SECTION 6: APP DOWNLOAD CTA */}
-      <section className="py-16 md:py-24 px-4 sm:px-6 border-t border-[var(--color-border)] bg-[var(--color-paper)] relative overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <FadeIn>
-            <div className="bg-[var(--color-ink-dark)] text-white p-8 sm:p-10 md:p-16 lg:p-20 rounded-md sm:rounded-[2.5rem] text-center shadow-2xl relative overflow-hidden border border-[var(--color-ink)]">
-              <div className="absolute top-0 right-0 w-[20rem] md:w-[40rem] h-[20rem] md:h-[40rem] bg-gradient-to-bl from-[var(--color-accent)]/20 via-[var(--color-gold)]/5 to-transparent pointer-events-none rounded-md blur-3xl -translate-y-1/3 translate-x-1/3" />
-              <div className="absolute bottom-0 left-0 w-[15rem] md:w-[30rem] h-[15rem] md:h-[30rem] bg-gradient-to-tr from-[var(--color-accent)]/20 to-transparent pointer-events-none rounded-md blur-3xl translate-y-1/3 -translate-x-1/3" />
-              
-              <div className="relative z-10 flex flex-col items-center justify-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-md bg-white/5 border border-white/10 text-white text-xs sm:text-sm font-bold tracking-widest uppercase mb-6 sm:mb-8 backdrop-blur-sm">
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[var(--color-gold)]" />
-                  Vốn liếng trọn đời
-                </div>
-                
-                <h2 className="font-serif text-2xl sm:text-3xl md:text-5xl font-bold text-white leading-tight mb-6 sm:mb-8 max-w-4xl">
-                  Tặng nội dung Sống Sáng Suốt khi nghiêm túc thực tập <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-gold)] to-yellow-200">99 ngày</span> chuyển hóa cuộc đời mình
-                </h2>
-                
-                <div className="space-y-4 mb-10 sm:mb-12">
-                  <p className="text-lg sm:text-xl md:text-2xl text-white/80 font-serif italic leading-relaxed max-w-2xl mx-auto px-4 sm:px-0">
-                    "Hành trang không nằm ở kiến thức bạn đọc, mà ở sự <span className="text-white font-medium">chuyển hóa bạn thực hành</span> mỗi ngày."
-                  </p>
-                  
-                  <p className="text-xs sm:text-sm text-[var(--color-gold)]/80 font-sans font-bold leading-relaxed max-w-2xl mx-auto uppercase tracking-widest px-4 sm:px-0">
-                    Toàn bộ nội dung được tham khảo độc quyền tại Sống Sáng Suốt
-                  </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 sm:gap-6 justify-center items-center">
-                  {/* iOS Store Button */}
-                  <a href="https://apps.apple.com/vn/app/s%E1%BB%91ng-s%C3%A1ng-su%E1%BB%91t/id6738382979?l=vi" target="_blank" rel="noopener noreferrer" className="flex flex-row items-center justify-center sm:justify-start gap-4 bg-black border border-white/20 hover:border-white/50 text-white rounded-md px-6 py-3 w-full sm:w-[260px] md:w-[280px] hover:-translate-y-1 hover:scale-105 transition-all duration-700 ease-in-out shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] group">
-                    <svg className="w-8 h-8 sm:w-9 sm:h-9 text-white group-hover:text-gray-200 transition-colors shrink-0" viewBox="0 0 384 512" fill="currentColor">
-                      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
-                    </svg>
-                    <div className="flex flex-col items-start justify-center">
-                      <span className="text-[9px] sm:text-[10px] uppercase font-semibold text-white/70 leading-none mb-1">Download on the</span>
-                      <span className="text-lg sm:text-xl font-bold leading-none tracking-wide text-white">App Store</span>
-                    </div>
-                  </a>
+<RegistrationFormSection />
 
-                  {/* Google Play Button */}
-                  <a href="https://play.google.com/store/apps/details?id=com.app365hanhnguyen.hanhnguyen" target="_blank" rel="noopener noreferrer" className="flex flex-row items-center justify-center sm:justify-start gap-4 bg-black border border-white/20 hover:border-white/50 text-white rounded-md px-6 py-3 w-full sm:w-[260px] md:w-[280px] hover:-translate-y-1 hover:scale-105 transition-all duration-700 ease-in-out shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] group">
-                    <svg className="w-8 h-8 sm:w-9 sm:h-9 text-white group-hover:text-gray-200 transition-colors shrink-0" viewBox="0 0 512 512" fill="currentColor">
-                      <path d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/>
-                    </svg>
-                    <div className="flex flex-col items-start justify-center">
-                      <span className="text-[9px] sm:text-[10px] uppercase font-semibold text-white/70 leading-none mb-1">GET IT ON</span>
-                      <span className="text-lg sm:text-xl font-bold leading-none tracking-wide text-white">Google Play</span>
-                    </div>
-                  </a>
-                </div>
-                
-                <div className="mt-10 pt-8 border-t border-white/10 w-full max-w-sm">
-                  <p className="text-sm text-white/50 font-medium leading-relaxed">
-                    Hỗ trợ hệ điều hành iOS và Android.<br/>
-                    <span className="text-white/80 font-semibold mt-1 block">Gặp trực tiếp Mentor để nhận tài khoản.</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      <ReflectionsSection />
+<ReflectionsSection />
       {/* FOOTER */}
       <footer className="py-12 border-t border-[var(--color-border)] bg-[var(--color-ink-dark)] text-center text-white/50">
         <p>© 2024 Sống Sáng Suốt. All rights reserved.</p>

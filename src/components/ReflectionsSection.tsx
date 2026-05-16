@@ -15,6 +15,7 @@ export default function ReflectionsSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Tất cả');
   const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
+  const [zaloLink, setZaloLink] = useState('');
 
   useEffect(() => {
     const q = query(collection(db, 'reflections'), orderBy('createdAt', 'desc'));
@@ -22,9 +23,23 @@ export default function ReflectionsSection() {
       const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setReflections(posts);
     }, (error) => {
-      handleFirestoreError(error, OperationType.LIST, 'reflections');
+      try {
+        handleFirestoreError(error, OperationType.LIST, 'reflections');
+      } catch (err) {
+        console.error("Caught firestore error silently:", err);
+      }
     });
-    return unsubscribe;
+
+    const unsubscribeSettings = onSnapshot(doc(db, 'settings', 'general'), (docSnap) => {
+      if (docSnap.exists()) {
+        setZaloLink(docSnap.data().zaloLink || '');
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeSettings();
+    };
   }, []);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,8 +129,26 @@ export default function ReflectionsSection() {
           <h3 className="text-xl font-bold text-[var(--color-ink-dark)] mb-6 relative z-10 font-serif">Chia sẻ trải nghiệm của bạn</h3>
           
           {user ? (
-            <form onSubmit={handleSubmit} className="relative z-10">
-              <div className="mb-4">
+            <div className="relative z-10">
+              {zaloLink && (
+                <div className="mb-8 p-4 bg-gradient-to-r from-[#F6F3E9] to-white border border-[#DBCDB3] rounded-md shadow-sm text-center">
+                  <h4 className="font-bold text-[#8B2C24] text-lg mb-2">Chúc mừng bạn đã gia nhập Cộng Đồng Thực Hành!</h4>
+                  <p className="text-[var(--color-muted-dark)] mb-4 text-sm font-serif">Mời bạn tham gia nhóm Zalo để nhận thêm tài liệu và kết nối cùng mọi người.</p>
+                  <a
+                    href={zaloLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#0068FF] hover:bg-[#0052cc] text-white font-bold py-2 px-6 rounded-full transition-all shadow-md uppercase tracking-wider text-sm"
+                  >
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M21.384 10.354C21.384 5.736 17.585 2 12.898 2S4.412 5.736 4.412 10.354c0 2.224.966 4.225 2.535 5.672-.258.918-.767 1.956-2.227 3.25a.302.302 0 0 0-.083.336.3.3 0 0 0 .285.203c2.72-.036 4.966-1.144 6.136-2.146.623.104 1.258.156 1.84.156 4.687 0 8.486-3.736 8.486-8.354z" />
+                    </svg>
+                    Tham gia nhóm Zalo
+                  </a>
+                </div>
+              )}
+              <form onSubmit={handleSubmit}>
+                <div className="mb-4">
                 <label className="block text-sm font-medium text-[var(--color-muted-dark)] mb-2 font-serif italic">Chọn chủ đề chuyển hóa:</label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map(cat => (
@@ -190,13 +223,14 @@ export default function ReflectionsSection() {
                   {isSubmitting ? 'Đang gửi...' : 'Gửi Chia Sẻ'}
                 </button>
               </div>
-            </form>
+              </form>
+            </div>
           ) : (
             <div className="text-center py-10 relative z-10 bg-[var(--color-surface)] rounded-md classic-border">
               <p className="text-[var(--color-ink)] mb-6 font-serif text-lg italic">Bạn cần đăng nhập để chia sẻ cảm xúc và chuyển hóa của mình.</p>
               <button 
                 onClick={loginWithGoogle}
-                className="bg-white border border-classic-border hover:bg-[var(--color-paper)] text-[var(--color-ink-dark)] font-bold py-3 px-8 rounded-md transition-all shadow-sm flex items-center gap-3 mx-auto uppercase tracking-widest text-sm"
+                className="bg-white border border-classic-border hover:bg-[var(--color-paper)] text-[var(--color-ink-dark)] font-bold py-3 px-8 rounded-md transition-all shadow-sm flex items-center gap-3 mx-auto uppercase tracking-widest text-sm mb-4"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -206,6 +240,9 @@ export default function ReflectionsSection() {
                 </svg>
                 Đăng nhập tham gia
               </button>
+              <p className="text-xs text-[var(--color-muted-dark)] font-serif italic max-w-sm mx-auto">
+                Chú ý: Nếu cửa sổ đăng nhập bị chặn, vui lòng mở ứng dụng ở thẻ mới (icon "Open in new tab" ở góc phải màn hình) hoặc làm mới lại trang.
+              </p>
             </div>
           )}
         </div>
